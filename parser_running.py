@@ -1,5 +1,6 @@
 import argparse
 import pickle
+import time
 
 from data_classes import ConllEntry, Sentence
 
@@ -116,13 +117,18 @@ parser_class = parser_dict[args.parser_name]
 parser = parser_class()
 
 res = {}
+time_dict = {}
 for treebank_name, treebank_sents in data.items():
     t_res = []
-    print(treebank_name)
+    print("\n", treebank_name)
+    t_time = []
     for i, sent in enumerate(treebank_sents):
         if i % 100 == 0:
             print(f"{i:4}/{len(treebank_sents)}")
+        ts = time.time()
         token_list = parser.parse(sent.text)
+        te = time.time()
+        t_time.append(te - ts)
         cur_res = Sentence()
         cur_res.set_sent_id(sent.sent_id)
         cur_res.set_text(sent.text)
@@ -130,7 +136,12 @@ for treebank_name, treebank_sents in data.items():
             cur_res.add_token(t)
         t_res.append(cur_res)
     res[treebank_name] = t_res
-    
+    time_dict[treebank_name] = sum(t_time)
+
+print("\ntime results (s):")
+for p, t in time_dict.items():
+    print(f"{p:10}: {t:5.3f} (s)")
+
 with open(f'{args.parser_name}.pickle', 'wb') as f:
     pickle.dump(res, f)
     
