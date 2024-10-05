@@ -118,9 +118,10 @@ parser = parser_class()
 res = {}
 for treebank_name, treebank_sents in data.items():
     t_res = []
+    print(treebank_name)
     for i, sent in enumerate(treebank_sents):
         if i % 100 == 0:
-            print(i)
+            print(f"{i:4}/{len(treebank_sents)}")
         token_list = parser.parse(sent.text)
         cur_res = Sentence()
         cur_res.set_sent_id(sent.sent_id)
