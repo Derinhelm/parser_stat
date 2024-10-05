@@ -85,9 +85,10 @@ class NatashaParser:
         emb = NewsEmbedding()
         self.segmenter = Segmenter()
         self.syntax_parser = NewsSyntaxParser(emb)
+        self.Doc = Doc
 
     def parse(self, sent):
-        doc = Doc(sent)
+        doc = self.Doc(sent)
         doc.segment(self.segmenter)
         doc.parse_syntax(self.syntax_parser)
         res = []
