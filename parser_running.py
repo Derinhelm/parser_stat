@@ -29,6 +29,8 @@ class UDPipeSpacyParser:
 class DeepPavlovParser:
     def __init__(self):
         from deeppavlov import build_model
+        import nltk
+        nltk.download('punkt_tab')
         self.model = build_model('syntax_ru_syntagrus_bert', install=True, download=True)
 
     def parse(self, sent):
