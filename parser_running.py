@@ -27,6 +27,34 @@ class UDPipeSpacyParser:
         return res
 
 
+class UDPipeSpacyTokenParser:
+    def __init__(self):
+        import spacy_udpipe
+        spacy_udpipe.download("ru")
+        self.udpipe_model = spacy_udpipe.load("ru")
+
+    def parse(self, sent):
+        def conll_tokenize(doc_text):
+            from spacy.tokens import Doc
+            res = Doc(self.udpipe_model.vocab, [t.form for t in sent.tokens if "." not in t.id])
+            print(res)
+            return res
+        self.udpipe_model.tokenizer = conll_tokenize
+        parsed = self.udpipe_model(sent.text)
+        res = []
+        for token in parsed:
+            if token.dep_ != 'ROOT':
+              parent_id = token.head.i+1
+              relation = token.dep_
+            else:
+              parent_id = 0
+              relation = 'root'
+            c = ConllEntry(str(token.i+1), form=token.text,
+                                   parent_id=str(parent_id), relation=relation)
+            res.append(c)
+        return res
+
+
 class DeepPavlovParser:
     def __init__(self):
         from deeppavlov import build_model
@@ -202,7 +230,7 @@ parser.add_argument('pickle_data_path', type=str, help='Path')
 parser.add_argument('parser_name', choices=["stanza", "spacy", "deeppavlov",\
                                             "udpipe", "natasha",
                                             "natasha_t", "spacy_t",
-                                            "deeppavlov_t", "stanza_t"])
+                                            "deeppavlov_t", "stanza_t", "udpipe_t"])
 args = parser.parse_args()
 print(args.pickle_data_path)
 print(args.parser_name)
@@ -215,7 +243,7 @@ parser_dict = { 'udpipe': UDPipeSpacyParser, 'stanza': StanzaParser,\
                 'spacy': SpacyParser, 'spacy_t': SpacyTokenParser,
                 'natasha_t': NatashaTokenParser,
                 'deeppavlov_t': DeepPavlovTokenParser,
-                'stanza_t': StanzaTokenParser}
+                'stanza_t': StanzaTokenParser, 'udpipe_t': UDPipeSpacyTokenParser}
 parser_class = parser_dict[args.parser_name]
 parser = parser_class()
 
