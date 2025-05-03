@@ -34,13 +34,7 @@ class UDPipeSpacyTokenParser:
         self.udpipe_model = spacy_udpipe.load("ru")
 
     def parse(self, sent):
-        def conll_tokenize(doc_text):
-            from spacy.tokens import Doc
-            res = Doc(self.udpipe_model.vocab, [t.form for t in sent.tokens if "." not in t.id])
-            print(res)
-            return res
-        self.udpipe_model.tokenizer = conll_tokenize
-        parsed = self.udpipe_model(sent.text)
+        parsed = self.udpipe_model.tokenizer([[t.form for t in sent.tokens if "." not in t.id]])
         res = []
         for token in parsed:
             if token.dep_ != 'ROOT':
