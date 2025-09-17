@@ -119,11 +119,12 @@ def profile_f(sent, parser, corpus_name, parser_name, i):
         ps.print_stats()
         stats_output.append(s.getvalue())
 
-        total_time = sum(stat[3] for stat in ps.stats.values())
+        total_time = ps.total_tt
         total_times.append(total_time)
 
     avg_time = statistics.mean(total_times)
 
+    # configured manually for each parser
     profiling_fields = [
         "trainable_pipe:40:__call__",
         "tok2vec.py:113(predict)",  # Эмбеддинги токенов
