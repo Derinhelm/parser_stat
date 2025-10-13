@@ -105,7 +105,7 @@ def extract_profiling_fields(stats_output, target_keys):
     return {k: sum(v) / len(v) if v else 0.0 for k, v in profiling_values.items()}
 
 
-def profile_f(sent, parser, corpus_name, parser_name, i, config_file):
+def profile_f(sent, parser, corpus_name, parser_name, i, profiling_fields):
     stats_output = []
     total_times = []
 
@@ -124,10 +124,6 @@ def profile_f(sent, parser, corpus_name, parser_name, i, config_file):
         total_times.append(total_time)
 
     avg_time = statistics.mean(total_times)
-
-    # configured manually for each parser
-    with open(config_file, 'r') as f:
-    	profiling_fields = yaml.safe_load(f)
 
     profiling_data = extract_profiling_fields(stats_output, profiling_fields)
 
@@ -158,6 +154,10 @@ parser_instance = parser_class()
 
 profiling_results = OrderedDict()
 
+# configured manually for each parser
+with open(config_file, 'r') as f:
+    profiling_fields = yaml.safe_load(f)
+
 for treebank_name, treebank_sents in data.items():
     print(f"\nProcessing corpus: {treebank_name}")
     t_res = []
@@ -165,7 +165,7 @@ for treebank_name, treebank_sents in data.items():
         if i % 100 == 0:
             print(f"{i:4}/{len(treebank_sents)}")
         t_res.append(
-            profile_f(sent, parser_instance, treebank_name, args.parser_name, i, config_file)
+            profile_f(sent, parser_instance, treebank_name, args.parser_name, i, profiling_fields)
         )
     profiling_results[treebank_name] = t_res
 
