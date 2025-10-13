@@ -1,0 +1,4 @@
+- depparse_processor.py:52 (process) # Синтаксический анализ
+- trainer.py:142 (predict) # Основной вызов модели синтаксического анализа
+- model.py:124 (forward) # Получение предсказаний
+- chuliu_edmonds.py:246 (chuliu_edmonds_one_root) # Построение графа зависимостей
