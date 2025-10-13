@@ -128,18 +128,6 @@ def profile_f(sent, parser, corpus_name, parser_name, i, config_file):
     # configured manually for each parser
     with open(config_file, 'r') as f:
     	profiling_fields = yaml.safe_load(f)
-    profiling_fields_old = [
-        "trainable_pipe:40:__call__",
-        "tok2vec.py:113(predict)",  # Эмбеддинги токенов
-        "model.py:330(predict)",  # Предсказание переходов
-        "model.py:124(layers)",  # Архитектура модели (CNN/MLP)
-        "beam_utils.py:200(collect_states)",  # Beam search: сбор состояний
-        "arc_eager.py:750(set_annotations)",  # Применение зависимостей (синтаксический анализ)
-        "nonproj.py:176(deprojectivize)",  # Восстановление непроектных дуг
-    ]
-    print(f"profiling_fields:{profiling_fields}")
-    print(f"profiling_fields_old:{profiling_fields_old}")
-    assert profiling_fields == profiling_fields_old
 
     profiling_data = extract_profiling_fields(stats_output, profiling_fields)
 
