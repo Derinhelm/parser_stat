@@ -1,0 +1,7 @@
+- trainable_pipe:40:__call__
+- tok2vec.py:113(predict) # Эмбеддинги токенов
+- model.py:330(predict) # Предсказание переходов
+- model.py:124(layers) # Архитектура модели (CNN/MLP)
+- beam_utils.py:200(collect_states) # Beam search: сбор состояний
+- arc_eager.py:750(set_annotations) # Применение зависимостей (синтаксический анализ)
+- nonproj.py:176(deprojectivize) # Восстановление непроектных дуг

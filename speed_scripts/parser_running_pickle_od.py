@@ -6,6 +6,7 @@ import pstats
 import io
 import statistics
 from collections import OrderedDict
+import yaml
 
 from data_classes import ConllEntry
 
@@ -104,7 +105,7 @@ def extract_profiling_fields(stats_output, target_keys):
     return {k: sum(v) / len(v) if v else 0.0 for k, v in profiling_values.items()}
 
 
-def profile_f(sent, parser, corpus_name, parser_name, i):
+def profile_f(sent, parser, corpus_name, parser_name, i, config_file):
     stats_output = []
     total_times = []
 
@@ -125,7 +126,9 @@ def profile_f(sent, parser, corpus_name, parser_name, i):
     avg_time = statistics.mean(total_times)
 
     # configured manually for each parser
-    profiling_fields = [
+    with open(config_file, 'r') as f:
+    	profiling_fields = yaml.safe_load(f)
+    profiling_fields_old = [
         "trainable_pipe:40:__call__",
         "tok2vec.py:113(predict)",  # Эмбеддинги токенов
         "model.py:330(predict)",  # Предсказание переходов
@@ -134,6 +137,9 @@ def profile_f(sent, parser, corpus_name, parser_name, i):
         "arc_eager.py:750(set_annotations)",  # Применение зависимостей (синтаксический анализ)
         "nonproj.py:176(deprojectivize)",  # Восстановление непроектных дуг
     ]
+    print(f"profiling_fields:{profiling_fields}")
+    print(f"profiling_fields_old:{profiling_fields_old}")
+    assert profiling_fields == profiling_fields_old
 
     profiling_data = extract_profiling_fields(stats_output, profiling_fields)
 
@@ -148,6 +154,7 @@ def profile_f(sent, parser, corpus_name, parser_name, i):
 
 parser = argparse.ArgumentParser(description="Info about parser tests")
 parser.add_argument("pickle_data_path", type=str, help="Path to input .pickle")
+parser.add_argument("config_file", type=str, help="Path to config file")
 parser.add_argument(
     "parser_name", choices=["stanza", "spacy", "natasha"]
 )
@@ -158,6 +165,7 @@ with open(args.pickle_data_path, "rb") as f:
 
 parser_dict = {"stanza": StanzaParser, "natasha": NatashaParser, "spacy": SpacyParser}
 parser_class = parser_dict[args.parser_name]
+config_file = args.config_file
 parser_instance = parser_class()
 
 profiling_results = OrderedDict()
@@ -169,7 +177,7 @@ for treebank_name, treebank_sents in data.items():
         if i % 100 == 0:
             print(f"{i:4}/{len(treebank_sents)}")
         t_res.append(
-            profile_f(sent, parser_instance, treebank_name, args.parser_name, i)
+            profile_f(sent, parser_instance, treebank_name, args.parser_name, i, config_file)
         )
     profiling_results[treebank_name] = t_res
 
