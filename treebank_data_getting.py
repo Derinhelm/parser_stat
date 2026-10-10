@@ -37,9 +37,10 @@ def get_dataset_sentences(dataset_path):
 
 
 sents = {}
-for treebank_name in ['gsd', 'pud', 'syntagrus', 'poetry', 'taiga']:
-    sents[treebank_name] = get_dataset_sentences(f"./treebank_test_sets/ru_{treebank_name}-ud-test.conllu")
+#for treebank_name in ['ru_gsd', 'ru_pud', 'ru_syntagrus', 'ru_poetry', 'ru_taiga']:
+for treebank_name in ['en_ewt', 'fi_ftb', 'fr_gsd', 'ja_gsd', 'zh_gsd']:
+    sents[treebank_name] = get_dataset_sentences(f"./treebank_test_sets/{treebank_name}-ud-test.conllu")
     print(treebank_name, len(sents[treebank_name]))
 
-with open(f'./treebank_test_sets/treebank_data.pickle', 'wb') as f:
+with open(f'./treebank_test_sets/treebank_data_languages.pickle', 'wb') as f:
     pickle.dump(sents, f)
